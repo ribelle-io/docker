@@ -6,8 +6,12 @@ currentname=sizufly
 
 #!/bin/bash
 
-while getopts 'sbc:i:h' opt; do
+while getopts 'lsbc:i:h' opt; do
 	case "$opt" in
+		l)
+			docker container ls
+			;;
+
 		s)
 			docker rm -f $currentdir 
 			docker image rm -f $currentname/$currentdir
@@ -49,6 +53,7 @@ while getopts 'sbc:i:h' opt; do
 			echo "    -c remove          remove $currentdir docker container."
 			echo "    -c start           start $currentdir docker container."
 			echo "    -c stop            stop $currentdir docker container."
+			echo "    -l                 list docker containers."
 			echo "    -b                 start bash into $currentdir docker container."
 			echo "    -s                 sweep docker image $currentname/$currentdir and docker container $currentdir."
 			exit 1
