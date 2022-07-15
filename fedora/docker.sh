@@ -4,8 +4,6 @@
 currentdir=${PWD##*/}
 currentname=sizufly
 
-#!/bin/bash
-
 while getopts 'lsbc:i:h' opt; do
 	case "$opt" in
 		l)
