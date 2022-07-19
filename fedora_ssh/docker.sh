@@ -2,15 +2,30 @@
 #Markus Schaeffer <sizufly@gmail.com>
 
 currentdir=${PWD##*/}
-currentname=sizufly
+currentname=ribelle
 
-while getopts 'lsbc:i:h' opt; do
+help(){
+	echo "Usage: $(basename $0) [-I arg] [-C arg] [-c arg] [-l] [-p] [-S]"
+	echo " "
+	echo "    -I create  create docker image."
+	echo "    -I remove  remove docker image."
+	echo "    -C create  create docker container."
+	echo "    -C remove  remove docker container."
+	echo "    -C start   start  docker container."
+	echo "    -C stop    stop r docker container."
+	echo "    -l         list docker containers."
+	echo "    -c bash    exec bash into docker container."
+	echo "    -c ssh     exec ssh root@localhost -p 2022 into container."
+	echo "    -S         sweep docker image and docker container."
+}
+
+while getopts 'lSbc:C:I:h' opt; do
 	case "$opt" in
 		l)
 			docker container ls
 			;;
 
-		s)
+		S)
 			docker rm -f $currentdir 
 			docker image rm -f $currentname/$currentdir
 			;;
@@ -19,8 +34,17 @@ while getopts 'lsbc:i:h' opt; do
 			echo "Processing option 'b'"
 			docker exec -it $currentdir bash
 			;;
+
+		c)
+			arg="$OPTARG"
+			if [ "$arg" = "bash" ]; then
+				docker exec -it $currentdir bash
+			elif [ "$arg" = "ssh" ]; then
+				ssh root@localhost -p 2022
+			fi
+			;;
 		
-		i)
+		I)
 			arg="$OPTARG"
 			if [ "$arg" = "create" ]; then
 				docker build -t $currentname/$currentdir .
@@ -29,10 +53,11 @@ while getopts 'lsbc:i:h' opt; do
 			fi
 			;;
 		
-		c)
+		C)
 			arg="$OPTARG"
 			if [ "$arg" = "create" ]; then
-				docker run -d -P --rm -ti --name $currentdir $currentname/$currentdir:latest
+				#docker run -d -P --rm -ti --name $currentdir $currentname/$currentdir:latest
+				docker run -d -P -p 2022:22 --rm -ti --name $currentdir $currentname/$currentdir:latest
 			elif [ "$arg" = "remove" ]; then
 				docker rm -f $currentdir 
 			elif [ "$arg" = "start" ]; then
@@ -45,17 +70,7 @@ while getopts 'lsbc:i:h' opt; do
 			;;
 		
 		?|h)
-			echo "Usage: $(basename $0) [-s] [-a] [-c arg] [i- arg]"
-			echo " "
-			echo "    -i create          create $currentname/$currentdir docker image."
-			echo "    -i remove          remove $currentname/$currentdir docker image."
-			echo "    -c create          create $currentdir docker container."
-			echo "    -c remove          remove $currentdir docker container."
-			echo "    -c start           start $currentdir docker container."
-			echo "    -c stop            stop $currentdir docker container."
-			echo "    -l                 list docker containers."
-			echo "    -b                 start bash into $currentdir docker container."
-			echo "    -s                 sweep docker image $currentname/$currentdir and docker container $currentdir."
+			help
 			exit 1
 			;;
 	esac
