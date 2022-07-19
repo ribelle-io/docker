@@ -1,13 +1,26 @@
 # dockerfile with cache
-#FROM fedora:latest
-FROM ubuntu:16.04
+FROM fedora:latest
 
 LABEL maintainer Markus Schaeffer <sizufly@gmail.com>
 
-RUN apt-get update && apt-get install -y openssh-server
+RUN dnf -y install openssh-server
+#RUN mkdir /root/.ssh; chown root. /root/.ssh; chmod 700 /root/.ssh
+#RUN ssh-keygen -A
+#ADD /Users/wasp/.ssh/id_rsa.pub /root/.ssh/authorized_keys
+#ADD .ssh/id_rsa.pub /root/.ssh/authorized_keys
+
 RUN mkdir /var/run/sshd
 RUN echo 'root:lance76' | chpasswd
 RUN sed -i 's/PermitRootLogin prohibit-password/PermitRootLogin yes/' /etc/ssh/sshd_config
 RUN sed 's@session\s*required\s*pam_loginuid.so@session optional pam_loginuid.so@g' -i /etc/pam.d/sshd
+
 EXPOSE 22
 CMD ["/usr/sbin/sshd", "-D"]
+
+
+#RUN mkdir /var/run/sshd
+#RUN echo 'root:lance76' | chpasswd
+#RUN sed -i 's/PermitRootLogin prohibit-password/PermitRootLogin yes/' /etc/ssh/sshd_config
+#RUN sed 's@session\s*required\s*pam_loginuid.so@session optional pam_loginuid.so@g' -i /etc/pam.d/sshd
+#EXPOSE 22
+#CMD ["/usr/sbin/sshd", "-D"]
