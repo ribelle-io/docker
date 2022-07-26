@@ -1,26 +1,40 @@
-# dockerfile with cache
 FROM fedora:latest
+LABEL maintainer Abhishek Tanwar <abhishek.kumartanwar@gmail.com>
 
-LABEL maintainer Markus Schaeffer <sizufly@gmail.com>
+# Base packages and some utilities
+RUN dnf -y update && dnf -y install openssh-server passwd procps && dnf clean all
 
-RUN dnf -y install openssh-server
-#RUN mkdir /root/.ssh; chown root. /root/.ssh; chmod 700 /root/.ssh
-#RUN ssh-keygen -A
-#ADD /Users/wasp/.ssh/id_rsa.pub /root/.ssh/authorized_keys
-#ADD .ssh/id_rsa.pub /root/.ssh/authorized_keys
+# Create a user “sshuser” and group “sshgroup”
+RUN groupadd sshgroup && useradd -ms /bin/bash -g sshgroup sshuser
 
-RUN mkdir /var/run/sshd
-RUN echo 'root:lance76' | chpasswd
-RUN sed -i 's/PermitRootLogin prohibit-password/PermitRootLogin yes/' /etc/ssh/sshd_config
-RUN sed 's@session\s*required\s*pam_loginuid.so@session optional pam_loginuid.so@g' -i /etc/pam.d/sshd
+# Create sshuser directory in home
+RUN mkdir -p /home/sshuser/.ssh
+
+
+# Intall Keygen
+RUN ssh-keygen -A
+
+# Copy the ssh public key in the authorized_keys file. The idkey.pub below is a public key file you get from ssh-keygen. They are under ~/.ssh directory by default.
+COPY id_rsa.pub /home/sshuser/.ssh/authorized_keys
+
+# change ownership of the key file.
+RUN chown sshuser:sshgroup /home/sshuser/.ssh/authorized_keys && chmod 600 /home/sshuser/.ssh/authorized_keys
+
+# generate default keys for test user
+#RUN sudo -u test ssh-keygen -t rsa -N '' -f /var/home/test/.ssh/id_rsa <<< y
+
+# copy host key to the keys in container
+#COPY id_rsa.pub /var/home/test/.ssh/authorized_keys
+
+# change ownership
+#RUN chown test:test /var/home/test/.ssh/authorized_keys
+
+# change permission
+#RUN chmod 640 /var/home/test/.ssh/authorized_keys
+
+
+# Expose docker port 22
 
 EXPOSE 22
 CMD ["/usr/sbin/sshd", "-D"]
-
-
-#RUN mkdir /var/run/sshd
-#RUN echo 'root:lance76' | chpasswd
-#RUN sed -i 's/PermitRootLogin prohibit-password/PermitRootLogin yes/' /etc/ssh/sshd_config
-#RUN sed 's@session\s*required\s*pam_loginuid.so@session optional pam_loginuid.so@g' -i /etc/pam.d/sshd
-#EXPOSE 22
-#CMD ["/usr/sbin/sshd", "-D"]
+ 
