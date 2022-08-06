@@ -57,7 +57,6 @@ while getopts 'lSbc:C:I:h' opt; do
 		C)
 			arg="$OPTARG"
 			if [ "$arg" = "create" ]; then
-				#docker run -d -P --rm -ti --name $currentdir $currentname/$currentdir:latest
 				docker run -d -P -p 2022:22 --rm -ti --name $currentdir $currentname/$currentdir:latest
 			elif [ "$arg" = "remove" ]; then
 				docker rm -f $currentdir 
