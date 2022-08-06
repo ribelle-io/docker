@@ -1,5 +1,6 @@
 # dockerfile with cache
 FROM fedora:36
+
 LABEL maintainer Markus Schaeffer <sizufly@gmail.com>
 
 RUN dnf install -y gcc \
