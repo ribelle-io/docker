@@ -1,4 +1,5 @@
 #!/bin/sh
+
 #Markus Schaeffer <sizufly@gmail.com>
 
 currentdir=${PWD##*/}
@@ -40,7 +41,7 @@ while getopts 'lSbc:C:I:h' opt; do
 			if [ "$arg" = "bash" ]; then
 				docker exec -it $currentdir bash
 			elif [ "$arg" = "ssh" ]; then
-				ssh root@localhost -p 2022
+				ssh -i idkey sshuser@localhost -p 2022
 			fi
 			;;
 		
