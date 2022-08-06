@@ -1,0 +1,33 @@
+FROM centos:latest
+
+RUN cd /etc/yum.repos.d/
+RUN sed -i 's/mirrorlist/#mirrorlist/g' /etc/yum.repos.d/CentOS-*
+RUN sed -i 's|#baseurl=http://mirror.centos.org|baseurl=http://vault.centos.org|g' /etc/yum.repos.d/CentOS-*
+
+# Base packages and some utilities
+RUN dnf -y update && dnf -y install openssh-server passwd procps && dnf clean all
+
+# Create a user “sshuser” and group “sshgroup”
+RUN groupadd sshgroup && useradd -ms /bin/bash -g sshgroup sshuser
+
+# Create sshuser directory in home
+RUN mkdir -p /home/sshuser/.ssh
+
+# Intall Keygen
+RUN ssh-keygen -A
+
+# Copy the ssh public key in the authorized_keys file.
+# The idkey.pub below is a public key file you get from ssh-keygen.
+# They are under ~/.ssh directory by default.
+COPY id_rsa.pub /home/sshuser/.ssh/authorized_keys
+
+# Change ownership of the key file.
+RUN chown sshuser:sshgroup /home/sshuser/.ssh/authorized_keys && chmod 600 /home/sshuser/.ssh/authorized_keys
+
+# generate default keys for test user
+#RUN sudo -u sshuser ssh-keygen -t rsa -N '' -f /home/ssuser/.ssh/id_rsa <<< y
+
+# Expose docker port 22
+EXPOSE 22
+RUN rm -rf /run/nologin
+CMD ["/usr/sbin/sshd", "-D"]
