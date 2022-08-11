@@ -13,6 +13,13 @@ COPY id_rsa.pub /home/sshuser/.ssh/authorized_keys
 # change ownership of the key file. 
 RUN chown sshuser:sshgroup /home/sshuser/.ssh/authorized_keys && chmod 600 /home/sshuser/.ssh/authorized_keys
 
+# Create default work dir and change into it.
+RUN mkdir -p /pkg
+WORKDIR /pkg
+
+# Change ownership of work dir.
+RUN chown zoot:sshgroup /pkg && chmod 700 /pkg
+
 # Start SSH service
 RUN service ssh start
 

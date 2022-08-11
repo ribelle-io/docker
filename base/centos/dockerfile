@@ -30,6 +30,9 @@ RUN chown zoot:sshgroup /home/zoot/.ssh/authorized_keys && chmod 600 /home/zoot/
 RUN mkdir -p /pkg
 WORKDIR /pkg
 
+# Change ownership of work dir.
+RUN chown zoot:sshgroup /pkg && chmod 700 /pkg
+
 # Expose docker port 22
 EXPOSE 22
 RUN rm -rf /run/nologin
