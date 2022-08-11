@@ -3,13 +3,14 @@ FROM fedora:latest
 LABEL maintainer Markus Schaeffer <sizufly@gmail.com>
 
 # Base packages and some utilities
-RUN dnf -y update && dnf -y install openssh-server passwd procps && dnf clean all
+RUN dnf -y update && dnf -y install openssh-server openssh-clients passwd procps && dnf clean all
 
 # Create a user “sshuser” and group “sshgroup”
 RUN groupadd sshgroup && useradd -ms /bin/bash -g sshgroup sshuser
 
 # Create sshuser directory in home
 RUN mkdir -p /home/sshuser/.ssh
+RUN chown sshuser:sshgroup /home/sshuser/.ssh && chmod 700 /home/sshuser/.ssh
 
 # Intall Keygen
 RUN ssh-keygen -A
