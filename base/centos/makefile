@@ -29,6 +29,9 @@ stop:
 bash:	
 	docker exec -it $(CURRENTDIR) bash
 
+root:	
+	docker exec -it -u root $(CURRENTDIR) bash
+
 ssh:
 	ssh zoot@localhost -p 2022
 
