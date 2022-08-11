@@ -1,5 +1,5 @@
 CURRENTNAME = ribelle
-CURRENTDIR	= $(notdir $(shell pwd))
+CURRENTDIR = $(notdir $(shell pwd))
 
 .PHONY: clean
 
