@@ -27,6 +27,7 @@ stop:
 	docker stop $(CURRENTDIR)
 
 cleanup:
+	rm -f id_rsa.pub
 	docker stop $(shell docker ps -a -q)
 	docker system prune -a -f
 
