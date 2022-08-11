@@ -26,8 +26,16 @@ start:
 stop:
 	docker stop $(CURRENTDIR)
 
+cleanup:
+	rm -f id_rsa.pub
+	docker stop $(shell docker ps -a -q)
+	docker system prune -a -f
+
 bash:	
 	docker exec -it $(CURRENTDIR) bash
+
+root:	
+	docker exec -it -u root $(CURRENTDIR) bash
 
 ssh:
 	ssh zoot@localhost -p 2022
