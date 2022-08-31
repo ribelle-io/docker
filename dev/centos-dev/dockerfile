@@ -1,0 +1,43 @@
+FROM centos:latest
+LABEL maintainer Markus Schaeffer <sizufly@gmail.com>
+
+# Base repos
+RUN cd /etc/yum.repos.d/
+RUN sed -i 's/mirrorlist/#mirrorlist/g' /etc/yum.repos.d/CentOS-*
+RUN sed -i 's|#baseurl=http://mirror.centos.org|baseurl=http://vault.centos.org|g' /etc/yum.repos.d/CentOS-*
+
+# Base packages and some utilities
+RUN dnf -y update && dnf -y install openssh-server passwd procps && dnf clean all
+
+# Create a user “sshuser” and group “sshgroup”
+RUN groupadd sshgroup && useradd -ms /bin/bash -g sshgroup zoot
+
+# Create sshuser directory in home
+RUN mkdir -p /home/zoot/.ssh
+
+# Intall Keygen
+RUN ssh-keygen -A
+
+# Copy the ssh public key in the authorized_keys file.
+# The idkey.pub below is a public key file you get from ssh-keygen.
+# They are under ~/.ssh directory by default.
+COPY id_rsa.pub /home/zoot/.ssh/authorized_keys
+
+# Change ownership of the key file.
+RUN chown zoot:sshgroup /home/zoot/.ssh/authorized_keys && chmod 600 /home/zoot/.ssh/authorized_keys
+
+# Create default work dir and change into it
+RUN mkdir -p /pkg
+
+# Change ownership of work dir.
+RUN chown zoot:sshgroup /pkg && chmod 700 /pkg
+
+WORKDIR /pkg
+
+# Change ownership of work dir.
+RUN chown zoot:sshgroup /pkg && chmod 700 /pkg
+
+# Expose docker port 22
+EXPOSE 22
+RUN rm -rf /run/nologin
+CMD ["/usr/sbin/sshd", "-D"]
