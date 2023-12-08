@@ -9,6 +9,20 @@ RUN sed -i 's|#baseurl=http://mirror.centos.org|baseurl=http://vault.centos.org|
 # Base packages and some utilities
 RUN dnf -y update && dnf -y install openssh-server passwd procps && dnf clean all
 
+RUN dnf clean all && \
+    dnf -y install epel-release && \
+    dnf -y install git gcc-c++ openssl-devel make chrpath \
+        valgrind wget which openssl-libs libicu zlib git libtool rpm-build gzip tar \
+        openssh openssh-server openssh-clients && \
+    dnf -y clean all
+
+ENV LC_ALL en_US.UTF-8
+ENV LANG en_US.UTF-8
+ENV LANGUAGE en_US.UTF-8
+ENV LD_LIBRARY_PATH /usr/local/lib64:/usr/local/lib
+ENV PKG_CONFIG_PATH /usr/local/lib/pkgconfig
+ENV TERM=xterm-256color
+
 # Create a user “sshuser” and group “sshgroup”
 RUN groupadd sshgroup && useradd -ms /bin/bash -g sshgroup zoot
 
@@ -28,6 +42,7 @@ RUN chown zoot:sshgroup /home/zoot/.ssh/authorized_keys && chmod 600 /home/zoot/
 
 # Create default work dir and change into it
 RUN mkdir -p /pkg
+RUN export PS1="$ "
 
 # Change ownership of work dir.
 RUN chown zoot:sshgroup /pkg && chmod 700 /pkg
